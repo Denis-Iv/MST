@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 
 namespace MinimumSpanningTree.NonlinearDs
@@ -48,10 +49,33 @@ namespace MinimumSpanningTree.NonlinearDs
         }
 
         public override String ToString()
-            => Value.ToString();
+        {
+            const String CLOSE_NODE_FORMATTER = "  } \n}";
+            const String EDGE_TEMPLATE = "    {0},\n";
+            DefineNodesProperties(out StringBuilder builder);
+
+            if (Edges.Count == 0)
+                return builder.Append(CLOSE_NODE_FORMATTER).ToString();
+
+            builder.Append(Environment.NewLine);
+            foreach (Edge edge in Edges)
+                builder.Append(String.Format(EDGE_TEMPLATE, edge));
+
+            builder.Append(CLOSE_NODE_FORMATTER);
+            return builder.ToString();
+        }
 
         public override Int32 GetHashCode()
             => HashCode.Combine(Value, Edges);
+
+        private void DefineNodesProperties(out StringBuilder builder)
+        {
+            builder = new StringBuilder();
+
+            builder.Append($"Node {{\n");
+            builder.Append($"  { nameof(Value) }: { Value },\n");
+            builder.Append($"  { nameof(Edges) }: {{");
+        }
 
 
         public class Edge : IEquatable<Edge>, IComparable<Edge>
@@ -92,7 +116,7 @@ namespace MinimumSpanningTree.NonlinearDs
             }
 
             public override String ToString()
-                => String.Format("Weighted Factor: {0}\nDestination: {1}", WeightedFactor, Destination);
+                => $"{{ WeightedFactor: {WeightedFactor}, DestinationValue: { Destination.Value } }}";
 
             public override Int32 GetHashCode()
                 => HashCode.Combine(WeightedFactor, Destination);
