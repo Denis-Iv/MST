@@ -8,7 +8,7 @@ namespace MinimumSpanningTree.ConsoleUI
     public static class Application
     {
         public static void Main()
-        {            
+        {
         }
     }
 }

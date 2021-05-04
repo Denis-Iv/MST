@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace MinimumSpanningTree.NonlinearDs
 {
-    public class Graph<TValue, TWeightedFactor>
+    public class Graph<TValue, TWeightedFactor> : IEnumerable<Node<TValue, TWeightedFactor>>
         where TWeightedFactor : IComparable<TWeightedFactor>
     {
         private readonly Dictionary<Object, Node<TValue, TWeightedFactor>> _data;
@@ -18,6 +19,15 @@ namespace MinimumSpanningTree.NonlinearDs
 
         public Node<TValue, TWeightedFactor> this[Object identity]
             => _data[identity];
+
+        IEnumerator IEnumerable.GetEnumerator()
+            => GetEnumerator();
+
+        public IEnumerator<Node<TValue, TWeightedFactor>> GetEnumerator()
+        {
+            foreach (var item in _data)
+                yield return item.Value;
+        }
 
         public void Join(Object identity, TValue value)
         {
