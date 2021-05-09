@@ -4,34 +4,36 @@ using System.Text;
 
 namespace MinimumSpanningTree.NonlinearDs.DisjointSet
 {
-    public class DisjointSet<T>
+    public class DisjointSet<TNodeValue, TWeight>
+        where TWeight : IComparable<TWeight>
     {
-        private Dictionary<T, DisjointSetNode<T>> _disjointSetSingleElements;
-        private List<DisjointSetNode<T>> _disjointSet;
+        private Dictionary<Node<TNodeValue, TWeight>, DisjointSetNode<Node<TNodeValue, TWeight>>> _disjointSetSingleElements;
+        private List<DisjointSetNode<Node<TNodeValue, TWeight>>> _disjointSet;
 
         public DisjointSet()
         {
-            _disjointSetSingleElements = new Dictionary<T, DisjointSetNode<T>>();
-            _disjointSet = new List<DisjointSetNode<T>>();
+            _disjointSetSingleElements = new Dictionary<Node<TNodeValue, TWeight>, DisjointSetNode<Node<TNodeValue, TWeight>>>();
+            _disjointSet = new List<DisjointSetNode<Node<TNodeValue, TWeight>>>();
         }
 
         public Int32 NumberOfComponents
             => _disjointSet.Count;
 
-        //must ask team for feedback on this method
-        public void AddToSet(T element)
+        public void AddToSet(IEnumerable<Node<TNodeValue, TWeight>> elements)
         {
-            var node = _disjointSetSingleElements[element];
-
-            if(node == null)
+            foreach(var element in elements)
             {
-                var newNode = new DisjointSetNode<T>(element);
+                if (!_disjointSetSingleElements.TryGetValue(element, out _))
+                    return;
+
+                var newNode = new DisjointSetNode<Node<TNodeValue, TWeight>>(element);
                 _disjointSetSingleElements.Add(element, newNode);
                 _disjointSet.Add(newNode);
             }
+
         }
 
-        public T Find(T element)
+        public Node<TNodeValue, TWeight> Find(Node<TNodeValue, TWeight> element)
         {
             var node = _disjointSetSingleElements[element];
 
@@ -40,10 +42,10 @@ namespace MinimumSpanningTree.NonlinearDs.DisjointSet
             return componentRepresentative.Element;
         }
 
-        public void Union(T elementX, T elementY)
+        public void Union(Node<TNodeValue, TWeight> elementX, Node<TNodeValue, TWeight> elementY)
         {
-            DisjointSetNode<T> representativeOfX = FindComponentRepresentative(_disjointSetSingleElements[elementX]);
-            DisjointSetNode<T> representativeOfY = FindComponentRepresentative(_disjointSetSingleElements[elementY]);
+            DisjointSetNode<Node<TNodeValue, TWeight>> representativeOfX = FindComponentRepresentative(_disjointSetSingleElements[elementX]);
+            DisjointSetNode<Node<TNodeValue, TWeight>> representativeOfY = FindComponentRepresentative(_disjointSetSingleElements[elementY]);
 
             if (representativeOfX == representativeOfY)
                 return;
@@ -68,7 +70,7 @@ namespace MinimumSpanningTree.NonlinearDs.DisjointSet
             }
         }
 
-        private DisjointSetNode<T> FindComponentRepresentative(DisjointSetNode<T> node)
+        private DisjointSetNode<Node<TNodeValue, TWeight>> FindComponentRepresentative(DisjointSetNode<Node<TNodeValue, TWeight>> node)
         {
             if (node == node.Parent)
                 return node;
@@ -94,6 +96,5 @@ namespace MinimumSpanningTree.NonlinearDs.DisjointSet
             public int CompareTo(DisjointSetNode<NodeType> other)
                 => Rank.CompareTo(other.Rank);
         }
-
     }
 }
