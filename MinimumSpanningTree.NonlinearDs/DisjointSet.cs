@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MinimumSpanningTree.NonlinearDs.DisjointSet
+namespace MinimumSpanningTree.NonlinearDs
 {
     public class DisjointSet<TNodeValue, TWeight>
         where TWeight : IComparable<TWeight>

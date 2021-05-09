@@ -83,5 +83,8 @@ namespace MinimumSpanningTree.NonlinearDs
 
             ConnectTwoWay(nodeAIdentity, nodeBIdentity, weightedFactor);
         }
+
+        public Graph<TValue, TWeightedFactor> FindMST()
+            => throw new NotImplementedException();
     }
 }

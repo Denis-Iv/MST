@@ -1,10 +1,10 @@
 ﻿using System;
-using MinimumSpanningTree.NonlinearDs.DisjointSet;
+
 namespace MinimumSpanningTree.ConsoleUI
 {
-    using NonlinearDs;
     using Example;
-
+    using NonlinearDs;
+    
     public static class Application
     {
         public static void Main()
