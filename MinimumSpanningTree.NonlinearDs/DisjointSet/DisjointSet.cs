@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+
 
 namespace MinimumSpanningTree.NonlinearDs.DisjointSet
 {
@@ -48,14 +48,14 @@ namespace MinimumSpanningTree.NonlinearDs.DisjointSet
             if (representativeOfX == representativeOfY)
                 return;
 
-            int comparisson = representativeOfX.CompareTo(representativeOfY);
+            int comparison = representativeOfX.CompareTo(representativeOfY);
 
-            if (comparisson < 0)
+            if (comparison < 0)
             {
                 representativeOfX.Parent = representativeOfY;
                 _disjointSet.Remove(representativeOfX);
             }
-            else if (comparisson > 0)
+            else if (comparison > 0)
             {
                 representativeOfY.Parent = representativeOfX;
                 _disjointSet.Remove(representativeOfY);
