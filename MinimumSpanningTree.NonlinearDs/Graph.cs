@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MinimumSpanningTree.NonlinearDs
 {
@@ -12,7 +13,7 @@ namespace MinimumSpanningTree.NonlinearDs
         public Graph()
         {
             Size = 0;
-            _data = new Dictionary<Object, Node<TValue, TWeightedFactor>>();            
+            _data = new Dictionary<Object, Node<TValue, TWeightedFactor>>();
         }
 
         public Int32 Size { get; private set; }
@@ -40,8 +41,8 @@ namespace MinimumSpanningTree.NonlinearDs
         }
 
         public void Connect(
-            Object sourceIdentity, 
-            Object destinationIdentity, 
+            Object sourceIdentity,
+            Object destinationIdentity,
             TWeightedFactor weightedFactor)
         {
             var sourceNode = _data[sourceIdentity];
@@ -52,9 +53,9 @@ namespace MinimumSpanningTree.NonlinearDs
         }
 
         public void Connect(
-            Object sourceIdentity, 
-            Object destinationIdentity, 
-            TValue destinationValue, 
+            Object sourceIdentity,
+            Object destinationIdentity,
+            TValue destinationValue,
             TWeightedFactor weightedFactor)
         {
             Join(destinationIdentity, destinationValue);
@@ -63,8 +64,8 @@ namespace MinimumSpanningTree.NonlinearDs
         }
 
         public void ConnectTwoWay(
-            Object nodeAIdentity, 
-            Object nodeBIdentity, 
+            Object nodeAIdentity,
+            Object nodeBIdentity,
             TWeightedFactor weightedFactor)
         {
             Connect(nodeAIdentity, nodeBIdentity, weightedFactor);
@@ -72,7 +73,7 @@ namespace MinimumSpanningTree.NonlinearDs
         }
 
         public void ConnectTwoWay(
-            Object nodeAIdentity, 
+            Object nodeAIdentity,
             TValue nodeAValue,
             Object nodeBIdentity,
             TValue nodeBValue,
@@ -84,7 +85,30 @@ namespace MinimumSpanningTree.NonlinearDs
             ConnectTwoWay(nodeAIdentity, nodeBIdentity, weightedFactor);
         }
 
-        public Graph<TValue, TWeightedFactor> FindMST()
-            => throw new NotImplementedException();
+        public void FindMST() // replace void with a return value in the end
+        {
+            var cheapest = new Dictionary<Node<TValue, TWeightedFactor>, Node<TValue,TWeightedFactor>.Edge>();
+
+            var disjointSet = new DisjointSet<TValue, TWeightedFactor>();
+            var nodesList = new List<Node<TValue, TWeightedFactor>>(_data.Values.ToList());
+            disjointSet.AddToSet(nodesList);
+
+            while (disjointSet.NumberOfComponents > 1)
+            {
+                foreach (var node in nodesList)
+                {
+                    foreach (var edge in node.Edges)
+                    {
+                        var node1 = disjointSet.Find(node);
+                        var node2 = disjointSet.Find(edge.Destination);
+
+                        if (node1.Equals(node2))
+                            continue;
+                    }
+                }
+                
+                return;
+            }
+        }
     }
 }

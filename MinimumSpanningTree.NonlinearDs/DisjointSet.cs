@@ -22,8 +22,8 @@ namespace MinimumSpanningTree.NonlinearDs
         {
             foreach(var element in elements)
             {
-                if (!_disjointSetSingleElements.TryGetValue(element, out _))
-                    return;
+                if (_disjointSetSingleElements.TryGetValue(element, out _))
+                    continue;
 
                 var newNode = new DisjointSetNode(element);
                 _disjointSetSingleElements.Add(element, newNode);
