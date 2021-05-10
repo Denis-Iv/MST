@@ -87,26 +87,62 @@ namespace MinimumSpanningTree.NonlinearDs
 
         public void FindMST() // replace void with a return value in the end
         {
-            var cheapest = new Dictionary<Node<TValue, TWeightedFactor>, Node<TValue,TWeightedFactor>.Edge>();
-
             var disjointSet = new DisjointSet<TValue, TWeightedFactor>();
             var nodesList = new List<Node<TValue, TWeightedFactor>>(_data.Values.ToList());
             disjointSet.AddToSet(nodesList);
 
             while (disjointSet.NumberOfComponents > 1)
             {
+                var cheapest = new Dictionary<Node<TValue, TWeightedFactor>,Dictionary<Node<TValue, TWeightedFactor>, Node<TValue, TWeightedFactor>.Edge>>();
+
                 foreach (var node in nodesList)
                 {
                     foreach (var edge in node.Edges)
                     {
-                        var node1 = disjointSet.Find(node);
-                        var node2 = disjointSet.Find(edge.Destination);
+                        var component1 = disjointSet.Find(node);
+                        var component2 = disjointSet.Find(edge.Destination);
 
-                        if (node1.Equals(node2))
+                        if (component1.Equals(component2))
                             continue;
+
+                        if (cheapest.ContainsKey(component1))
+                        {
+                            Int32 comparison = cheapest[component1].Values.SingleOrDefault().CompareTo(edge);
+                            if (comparison > 0)
+                            {
+                                cheapest[component1] =
+                                    new Dictionary<Node<TValue, TWeightedFactor>, Node<TValue, TWeightedFactor>.Edge>
+                                    {
+                                        {node, edge}
+                                    };
+                            }
+                        }
+                        else
+                        {
+                            cheapest.Add(component1, new Dictionary<Node<TValue, TWeightedFactor>, Node<TValue, TWeightedFactor>.Edge>());
+                            cheapest[component1].Add(node, edge);
+                        }
+
+                        if (cheapest.ContainsKey(component2))
+                        {
+                            Int32 comparison = cheapest[component2].Values.SingleOrDefault().CompareTo(edge);
+                            if (comparison > 0)
+                            {
+                                cheapest[component1] =
+                                    new Dictionary<Node<TValue, TWeightedFactor>, Node<TValue, TWeightedFactor>.Edge>
+                                    {
+                                        {node, edge}
+                                    };
+                            }
+                        }
+                        else
+                        {
+                            cheapest.Add(component2, new Dictionary<Node<TValue, TWeightedFactor>, Node<TValue, TWeightedFactor>.Edge>());
+                            cheapest[component2].Add(node, edge);
+                        }
                     }
                 }
-                
+
                 return;
             }
         }
