@@ -85,7 +85,7 @@ namespace MinimumSpanningTree.NonlinearDs
             ConnectTwoWay(nodeAIdentity, nodeBIdentity, weightedFactor);
         }
 
-        public void FindMST()
+        public Graph<TValue, TWeightedFactor> FindMST()
         {
             var disjointSet = new DisjointSet<TValue, TWeightedFactor>();
             var nodesList = new List<Node<TValue, TWeightedFactor>>(_data.Values.ToList());
@@ -93,7 +93,7 @@ namespace MinimumSpanningTree.NonlinearDs
 
             while (disjointSet.NumberOfComponents > 1)
             {
-                var cheapest = new Dictionary<Node<TValue, TWeightedFactor>,Dictionary<Node<TValue, TWeightedFactor>, Node<TValue, TWeightedFactor>.Edge>>();
+                var cheapest = new Dictionary<Object, Dictionary<Object, Node<TValue, TWeightedFactor>.Edge>>();
 
                 foreach (var node in nodesList)
                 {
@@ -111,7 +111,7 @@ namespace MinimumSpanningTree.NonlinearDs
                             if (comparison > 0)
                             {
                                 cheapest[component1] =
-                                    new Dictionary<Node<TValue, TWeightedFactor>, Node<TValue, TWeightedFactor>.Edge>
+                                    new Dictionary<Object, Node<TValue, TWeightedFactor>.Edge>
                                     {
                                         {node, edge}
                                     };
@@ -119,7 +119,7 @@ namespace MinimumSpanningTree.NonlinearDs
                         }
                         else
                         {
-                            cheapest.Add(component1, new Dictionary<Node<TValue, TWeightedFactor>, Node<TValue, TWeightedFactor>.Edge>());
+                            cheapest.Add(component1, new Dictionary<Object, Node<TValue, TWeightedFactor>.Edge>());
                             cheapest[component1].Add(node, edge);
                         }
 
@@ -129,7 +129,7 @@ namespace MinimumSpanningTree.NonlinearDs
                             if (comparison > 0)
                             {
                                 cheapest[component1] =
-                                    new Dictionary<Node<TValue, TWeightedFactor>, Node<TValue, TWeightedFactor>.Edge>
+                                    new Dictionary<Object, Node<TValue, TWeightedFactor>.Edge>
                                     {
                                         {node, edge}
                                     };
@@ -137,7 +137,7 @@ namespace MinimumSpanningTree.NonlinearDs
                         }
                         else
                         {
-                            cheapest.Add(component2, new Dictionary<Node<TValue, TWeightedFactor>, Node<TValue, TWeightedFactor>.Edge>());
+                            cheapest.Add(component2, new Dictionary<Object, Node<TValue, TWeightedFactor>.Edge>());
                             cheapest[component2].Add(node, edge);
                         }
                     }
@@ -147,7 +147,7 @@ namespace MinimumSpanningTree.NonlinearDs
                 {
                     if (cheapest.ContainsKey(node))
                     {
-                            var component1 = disjointSet.Find(cheapest[node].Keys.FirstOrDefault());
+                            var component1 = disjointSet.Find(_data[cheapest[node].Keys.FirstOrDefault()]);
                             var component2 = disjointSet.Find(cheapest[node].Values.FirstOrDefault()?.Destination);
 
                             if (component1.Equals(component2))
@@ -157,6 +157,8 @@ namespace MinimumSpanningTree.NonlinearDs
                     }
                 }
             }
+
+            return new Graph<TValue, TWeightedFactor>();
         }
     }
 }
