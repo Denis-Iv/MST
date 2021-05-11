@@ -16,7 +16,7 @@ namespace MinimumSpanningTree.ConsoleUI
             graph.ConnectTwoWay(3, 3, 0, 0, 5);
             graph.ConnectTwoWay(1, 1, 3, 3, 3);
 
-            // MST = 10
+            // MST = 7
             return graph;
         }
 

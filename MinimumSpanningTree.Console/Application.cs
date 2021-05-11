@@ -8,7 +8,7 @@ namespace MinimumSpanningTree.ConsoleUI
     {
         public static void Main()
         {
-            var graph = ExampleGraphs.Small();
+            var graph = ExampleGraphs.Large();
             graph.FindMST();
         }
     }

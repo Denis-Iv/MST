@@ -85,7 +85,7 @@ namespace MinimumSpanningTree.NonlinearDs
             ConnectTwoWay(nodeAIdentity, nodeBIdentity, weightedFactor);
         }
 
-        public void FindMST() // replace void with a return value in the end
+        public void FindMST()
         {
             var disjointSet = new DisjointSet<TValue, TWeightedFactor>();
             var nodesList = new List<Node<TValue, TWeightedFactor>>(_data.Values.ToList());
@@ -143,7 +143,19 @@ namespace MinimumSpanningTree.NonlinearDs
                     }
                 }
 
-                return;
+                foreach (var node in nodesList)
+                {
+                    if (cheapest.ContainsKey(node))
+                    {
+                            var component1 = disjointSet.Find(cheapest[node].Keys.FirstOrDefault());
+                            var component2 = disjointSet.Find(cheapest[node].Values.FirstOrDefault()?.Destination);
+
+                            if (component1.Equals(component2))
+                                continue;
+                            
+                            disjointSet.Union(component1, component2);
+                    }
+                }
             }
         }
     }
