@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MinimumSpanningTree.ConsoleUI
 {
@@ -8,8 +9,28 @@ namespace MinimumSpanningTree.ConsoleUI
     {
         public static void Main()
         {
-            var graph = ExampleGraphs.Large();
-            graph.FindMST();
+            var graph = ExampleGraphs.Large().FindMinimumSpanningTree();
+            var visitedNodes = new HashSet<Node<Int32, Int32>>();
+            
+            Int32 mstSumOfEdges = 0;
+
+            foreach (var node in graph)
+            {
+                foreach (var edge in node.Edges)
+                {
+                    if (visitedNodes.Contains(edge.Destination))
+                        continue;
+
+                    mstSumOfEdges += edge.WeightedFactor;
+                }
+
+                visitedNodes.Add(node);
+                Console.WriteLine(node);
+            }
+
+            Console.WriteLine(mstSumOfEdges);
+            
+            
         }
     }
 }

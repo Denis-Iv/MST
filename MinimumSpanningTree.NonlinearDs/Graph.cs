@@ -85,17 +85,19 @@ namespace MinimumSpanningTree.NonlinearDs
             ConnectTwoWay(nodeAIdentity, nodeBIdentity, weightedFactor);
         }
 
-        public Graph<TValue, TWeightedFactor> FindMST()
+        public Graph<TValue, TWeightedFactor> FindMinimumSpanningTree()
         {
+            var mstEdges = new List<Tuple<Node<TValue, TWeightedFactor>, Node<TValue, TWeightedFactor>.Edge>>();
+
+
             var disjointSet = new DisjointSet<TValue, TWeightedFactor>();
-            var nodesList = new List<Node<TValue, TWeightedFactor>>(_data.Values.ToList());
-            disjointSet.AddToSet(nodesList);
+            disjointSet.AddToSet(_data.Values);
 
             while (disjointSet.NumberOfComponents > 1)
             {
-                var cheapest = new Dictionary<Object, Dictionary<Object, Node<TValue, TWeightedFactor>.Edge>>();
-
-                foreach (var node in nodesList)
+                var cheapest = new Dictionary<Node<TValue, TWeightedFactor>, Tuple<Node<TValue, TWeightedFactor>, Node<TValue, TWeightedFactor>.Edge>>();
+                
+                foreach (var node in _data.Values)
                 {
                     foreach (var edge in node.Edges)
                     {
@@ -107,58 +109,105 @@ namespace MinimumSpanningTree.NonlinearDs
 
                         if (cheapest.ContainsKey(component1))
                         {
-                            Int32 comparison = cheapest[component1].Values.SingleOrDefault().CompareTo(edge);
+                            Int32 comparison = cheapest[component1].Item2.CompareTo(edge);
                             if (comparison > 0)
                             {
                                 cheapest[component1] =
-                                    new Dictionary<Object, Node<TValue, TWeightedFactor>.Edge>
-                                    {
-                                        {node, edge}
-                                    };
+                                    new Tuple<
+                                        Node<TValue, TWeightedFactor>,
+                                        Node<TValue, TWeightedFactor>.Edge>
+                                    (
+                                        node, edge
+                                    );
                             }
                         }
                         else
                         {
-                            cheapest.Add(component1, new Dictionary<Object, Node<TValue, TWeightedFactor>.Edge>());
-                            cheapest[component1].Add(node, edge);
+                            cheapest.Add(component1,
+                                new Tuple<Node<TValue, TWeightedFactor>,
+                                    Node<TValue, TWeightedFactor>.Edge>
+                                    (
+                                        node, edge
+                                    ));
                         }
 
                         if (cheapest.ContainsKey(component2))
                         {
-                            Int32 comparison = cheapest[component2].Values.SingleOrDefault().CompareTo(edge);
+                            Int32 comparison = cheapest[component2].Item2.CompareTo(edge);
                             if (comparison > 0)
                             {
-                                cheapest[component1] =
-                                    new Dictionary<Object, Node<TValue, TWeightedFactor>.Edge>
-                                    {
-                                        {node, edge}
-                                    };
+                                cheapest[component2] =
+                                    new Tuple<
+                                        Node<TValue, TWeightedFactor>,
+                                        Node<TValue, TWeightedFactor>.Edge>
+                                    (
+                                        node, edge
+                                    );
                             }
                         }
                         else
                         {
-                            cheapest.Add(component2, new Dictionary<Object, Node<TValue, TWeightedFactor>.Edge>());
-                            cheapest[component2].Add(node, edge);
+                            cheapest.Add(component2,
+                                new Tuple<
+                                    Node<TValue, TWeightedFactor>,
+                                    Node<TValue, TWeightedFactor>.Edge>
+                                    (
+                                        node, edge
+                                    ));
                         }
                     }
                 }
 
-                foreach (var node in nodesList)
+                foreach (var node in _data.Values)
                 {
                     if (cheapest.ContainsKey(node))
                     {
-                            var component1 = disjointSet.Find(_data[cheapest[node].Keys.FirstOrDefault()]);
-                            var component2 = disjointSet.Find(cheapest[node].Values.FirstOrDefault()?.Destination);
+                        #region MST edges accumulation 
+                        mstEdges.Add(new Tuple<Node<TValue, TWeightedFactor>,
+                                Node<TValue, TWeightedFactor>.Edge>
+                        (
+                            cheapest[node].Item1,
+                            cheapest[node].Item2
+                        ));
+                        #endregion
 
-                            if (component1.Equals(component2))
-                                continue;
-                            
-                            disjointSet.Union(component1, component2);
+                        var component1 = disjointSet.Find(cheapest[node].Item1);
+                        var component2 = disjointSet.Find(cheapest[node].Item2.Destination);
+
+                        if (component1.Equals(component2))
+                            continue;
+
+                        disjointSet.Union(component1, component2);
                     }
                 }
             }
 
-            return new Graph<TValue, TWeightedFactor>();
+            return GenerateMinimumSpanningTreeGraph(mstEdges);
+        }
+
+        private Graph<TValue, TWeightedFactor> GenerateMinimumSpanningTreeGraph(List<Tuple<Node<TValue, TWeightedFactor>, Node<TValue, TWeightedFactor>.Edge>> mstEdges)
+        {
+            var mstGraph = new Graph<TValue, TWeightedFactor>();
+            
+            foreach (var tuple in mstEdges)
+            {
+                var sourceNode = tuple.Item1;
+                var edge = tuple.Item2;
+                var destinationNode = edge.Destination;
+                
+                var sourceNodeId = _data.FirstOrDefault(x => x.Value.Equals(sourceNode)).Key;
+                var destinationNodeId = _data.FirstOrDefault(x => x.Value.Equals(destinationNode)).Key;
+                
+                mstGraph.ConnectTwoWay(
+                    sourceNodeId, 
+                    sourceNode.Value, 
+                    destinationNodeId, 
+                    destinationNode.Value, 
+                    edge.WeightedFactor
+                    );
+            }
+
+            return mstGraph;
         }
     }
 }
