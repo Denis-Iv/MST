@@ -107,42 +107,29 @@ namespace MinimumSpanningTree.NonlinearDs
                         if (component1.Equals(component2))
                             continue;
 
-                        if (cheapest.ContainsKey(component1))
-                        {
-                            Int32 comparison = cheapest[component1].Edge.CompareTo(edge);
-                            if (comparison > 0)
-                                cheapest[component1] = (node, edge);
-                        }
+                        if (cheapest.ContainsKey(component1) && cheapest[component1].Edge.CompareTo(edge) > 0)
+                            cheapest[component1] = (node, edge);
                         else
-                            cheapest.Add(component1, (node, edge));
+                            cheapest.TryAdd(component1, (node, edge));
 
-                        if (cheapest.ContainsKey(component2))
-                        {
-                            Int32 comparison = cheapest[component2].Edge.CompareTo(edge);
-                            if (comparison > 0)
-                                cheapest[component2] = (node, edge);
-                            
-                        }
+                        if (cheapest.ContainsKey(component2) && cheapest[component2].Edge.CompareTo(edge) > 0)
+                            cheapest[component2] = (node, edge);
                         else
-                            cheapest.Add(component2, (node, edge));
-                        
+                            cheapest.TryAdd(component2, (node, edge));
                     }
                 }
 
-                foreach (var node in _data.Values)
+                foreach (var node in _data.Values.Where(node => cheapest.ContainsKey(node)))
                 {
-                    if (cheapest.ContainsKey(node))
-                    {
-                        mstEdges.Add((cheapest[node].Node, cheapest[node].Edge));
+                    mstEdges.Add((cheapest[node].Node, cheapest[node].Edge));
 
-                        var component1 = disjointSet.Find(cheapest[node].Node);
-                        var component2 = disjointSet.Find(cheapest[node].Edge.Destination);
+                    var component1 = disjointSet.Find(cheapest[node].Node);
+                    var component2 = disjointSet.Find(cheapest[node].Edge.Destination);
 
-                        if (component1.Equals(component2))
-                            continue;
+                    if (component1.Equals(component2))
+                        continue;
 
-                        disjointSet.Union(component1, component2);
-                    }
+                    disjointSet.Union(component1, component2);
                 }
             }
 
