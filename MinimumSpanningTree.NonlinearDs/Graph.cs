@@ -87,7 +87,7 @@ namespace MinimumSpanningTree.NonlinearDs
 
         public Graph<TValue, TWeightedFactor> FindMinimumSpanningTree()
         {
-            var mstEdges = new List<(Node<TValue, TWeightedFactor>, Node<TValue, TWeightedFactor>.Edge)>();
+            var mstEdges = new List<(Node<TValue, TWeightedFactor> Node, Node<TValue, TWeightedFactor>.Edge Edge)>();
 
 
             var disjointSet = new DisjointSet<TValue, TWeightedFactor>();
@@ -95,7 +95,7 @@ namespace MinimumSpanningTree.NonlinearDs
 
             while (disjointSet.NumberOfComponents > 1)
             {
-                var cheapest = new Dictionary<Node<TValue, TWeightedFactor>, (Node<TValue, TWeightedFactor>, Node<TValue, TWeightedFactor>.Edge)>();
+                var cheapest = new Dictionary<Node<TValue, TWeightedFactor>, (Node<TValue, TWeightedFactor> Node, Node<TValue, TWeightedFactor>.Edge Edge)>();
                 
                 foreach (var node in _data.Values)
                 {
@@ -109,7 +109,7 @@ namespace MinimumSpanningTree.NonlinearDs
 
                         if (cheapest.ContainsKey(component1))
                         {
-                            Int32 comparison = cheapest[component1].Item2.CompareTo(edge);
+                            Int32 comparison = cheapest[component1].Edge.CompareTo(edge);
                             if (comparison > 0)
                                 cheapest[component1] = (node, edge);
                         }
@@ -118,7 +118,7 @@ namespace MinimumSpanningTree.NonlinearDs
 
                         if (cheapest.ContainsKey(component2))
                         {
-                            Int32 comparison = cheapest[component2].Item2.CompareTo(edge);
+                            Int32 comparison = cheapest[component2].Edge.CompareTo(edge);
                             if (comparison > 0)
                                 cheapest[component2] = (node, edge);
                             
@@ -133,10 +133,10 @@ namespace MinimumSpanningTree.NonlinearDs
                 {
                     if (cheapest.ContainsKey(node))
                     {
-                        mstEdges.Add((cheapest[node].Item1, cheapest[node].Item2));
+                        mstEdges.Add((cheapest[node].Node, cheapest[node].Edge));
 
-                        var component1 = disjointSet.Find(cheapest[node].Item1);
-                        var component2 = disjointSet.Find(cheapest[node].Item2.Destination);
+                        var component1 = disjointSet.Find(cheapest[node].Node);
+                        var component2 = disjointSet.Find(cheapest[node].Edge.Destination);
 
                         if (component1.Equals(component2))
                             continue;
@@ -149,14 +149,14 @@ namespace MinimumSpanningTree.NonlinearDs
             return GenerateMinimumSpanningTreeGraph(mstEdges);
         }
 
-        private Graph<TValue, TWeightedFactor> GenerateMinimumSpanningTreeGraph(List<(Node<TValue, TWeightedFactor>, Node<TValue, TWeightedFactor>.Edge)> mstEdges)
+        private Graph<TValue, TWeightedFactor> GenerateMinimumSpanningTreeGraph(List<(Node<TValue, TWeightedFactor> Node, Node<TValue, TWeightedFactor>.Edge Edge)> mstEdges)
         {
             var mstGraph = new Graph<TValue, TWeightedFactor>();
             
             foreach (var tuple in mstEdges)
             {
-                var sourceNode = tuple.Item1;
-                var edge = tuple.Item2;
+                var sourceNode = tuple.Node;
+                var edge = tuple.Edge;
                 var destinationNode = edge.Destination;
                 
                 var sourceNodeId = _data.FirstOrDefault(x => x.Value.Equals(sourceNode)).Key;
