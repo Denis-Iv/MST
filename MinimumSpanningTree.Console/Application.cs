@@ -9,7 +9,7 @@ namespace MinimumSpanningTree.ConsoleUI
     {
         public static void Main()
         {
-            var graph = ExampleGraphs.Large().FindMinimumSpanningTree();
+            var graph = ExampleGraphs.Small().FindMinimumSpanningTree();
             var visitedNodes = new HashSet<Node<Int32, Int32>>();
             
             Int32 mstSumOfEdges = 0;
