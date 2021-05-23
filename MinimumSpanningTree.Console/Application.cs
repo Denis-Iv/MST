@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace MinimumSpanningTree.ConsoleUI
 {
@@ -9,28 +10,35 @@ namespace MinimumSpanningTree.ConsoleUI
     {
         public static void Main()
         {
-            var graph = ExampleGraphs.Large().FindMinimumSpanningTree();
-            var visitedNodes = new HashSet<Node<Int32, Int32>>();
+            Stopwatch sw = new Stopwatch();
+            var graph = ExampleGraphs.Large();
+
+            sw.Start();
+            var mst = graph.FindMinimumSpanningTreeParallel();
+            sw.Stop();
+            //var visitedNodes = new HashSet<Node<Int32, Int32>>();
             
-            Int32 mstSumOfEdges = 0;
+            //Int32 mstSumOfEdges = 0;
 
-            foreach (var node in graph)
-            {
-                foreach (var edge in node.Edges)
-                {
-                    if (visitedNodes.Contains(edge.Destination))
-                        continue;
+            //foreach (var node in mst)
+            //{
+            //    foreach (var edge in node.Edges)
+            //    {
+            //        if (visitedNodes.Contains(edge.Destination))
+            //            continue;
 
-                    mstSumOfEdges += edge.WeightedFactor;
-                }
+            //        mstSumOfEdges += edge.WeightedFactor;
+            //    }
 
-                visitedNodes.Add(node);
-                Console.WriteLine(node);
-            }
+            //    visitedNodes.Add(node);
+            //    Console.WriteLine(node);
+            //}
 
-            Console.WriteLine(mstSumOfEdges);
-            
-            
+            //Console.WriteLine(mstSumOfEdges);
+
+            TimeSpan ts = sw.Elapsed;
+            string elapsedTime = ts.Milliseconds.ToString();
+            Console.WriteLine("RunTime " + elapsedTime);
         }
     }
 }
