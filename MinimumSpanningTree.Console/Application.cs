@@ -11,34 +11,46 @@ namespace MinimumSpanningTree.ConsoleUI
         public static void Main()
         {
             Stopwatch sw = new Stopwatch();
-            var graph = ExampleGraphs.Large();
+            var graph = new Graph<Int32, Int32>();
+            graph = ExampleGraphs.GenerateRandomGraph(2000);
 
             sw.Start();
-            var mst = graph.FindMinimumSpanningTreeParallel();
+            var mst = graph.FindMinimumSpanningTree();
             sw.Stop();
-            //var visitedNodes = new HashSet<Node<Int32, Int32>>();
-            
-            //Int32 mstSumOfEdges = 0;
-
-            //foreach (var node in mst)
-            //{
-            //    foreach (var edge in node.Edges)
-            //    {
-            //        if (visitedNodes.Contains(edge.Destination))
-            //            continue;
-
-            //        mstSumOfEdges += edge.WeightedFactor;
-            //    }
-
-            //    visitedNodes.Add(node);
-            //    Console.WriteLine(node);
-            //}
-
-            //Console.WriteLine(mstSumOfEdges);
 
             TimeSpan ts = sw.Elapsed;
-            string elapsedTime = ts.Milliseconds.ToString();
-            Console.WriteLine("RunTime " + elapsedTime);
+            String elapsedTimeConcurrent = ts.ToString();
+
+            sw.Reset();
+
+            sw.Start();
+            mst = graph.FindMinimumSpanningTreeParallel();
+            sw.Stop();
+            
+            ts = sw.Elapsed;
+            String elapsedTimeParallel = ts.ToString();
+            
+            Console.WriteLine($"Runtime concurrent:\t {elapsedTimeConcurrent}\nRuntime parallel:\t {elapsedTimeParallel}\n");
+
+            var visitedNodes = new HashSet<Node<Int32, Int32>>();
+
+            Int32 mstSumOfEdges = 0;
+
+            foreach (var node in mst)
+            {
+                foreach (var edge in node.Edges)
+                {
+                    if (visitedNodes.Contains(edge.Destination))
+                        continue;
+
+                    mstSumOfEdges += edge.WeightedFactor;
+                }
+
+                visitedNodes.Add(node);
+                //Console.WriteLine(node);
+            }
+
+            Console.WriteLine($"MST: {mstSumOfEdges}");
         }
     }
 }

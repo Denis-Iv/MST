@@ -140,6 +140,8 @@ namespace MinimumSpanningTree.NonlinearDs
 
         public Graph<TValue, TWeightedFactor> FindMinimumSpanningTreeParallel()
         {
+            const Int32 numberofthreads = 100;
+
             var mstEdges = new ConcurrentQueue<(Node<TValue, TWeightedFactor> Node, Node<TValue, TWeightedFactor>.Edge Edge)>();
 
             var disjointSet = new DisjointSet<TValue, TWeightedFactor>();
@@ -151,12 +153,12 @@ namespace MinimumSpanningTree.NonlinearDs
 
                 Parallel.ForEach(
                     _data.Values, 
-                    new ParallelOptions() { MaxDegreeOfParallelism = 2 },
+                    new ParallelOptions() { MaxDegreeOfParallelism = numberofthreads },
                     node => FindCheapestEdge(node, cheapest, disjointSet));
 
                 Parallel.ForEach(
                     _data.Values.Where(node => cheapest.ContainsKey(node)),
-                    new ParallelOptions() {MaxDegreeOfParallelism = 2},
+                    new ParallelOptions() {MaxDegreeOfParallelism = numberofthreads },
                     node => ContractComponents(node, mstEdges, cheapest, disjointSet));
                 
             }

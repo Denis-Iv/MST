@@ -59,5 +59,31 @@ namespace MinimumSpanningTree.ConsoleUI
             // MST = 37
             return graph;
         }
+
+        public static Graph<Int32, Int32> GenerateRandomGraph(Int32 numberOfNodes, Int32 numberOfEdges = -1)
+        {
+            Int32 maxWeight = 1000;
+            Int32 maxNumberOfEdges = numberOfNodes * ((numberOfNodes - 1) / 2);
+
+            var graph = new Graph<Int32, Int32>();
+
+            Random rnd = new Random();
+
+            if (numberOfEdges == -1 || numberOfEdges > maxNumberOfEdges)
+                numberOfEdges = rnd.Next(numberOfNodes, maxNumberOfEdges);
+
+            for (Int32 i = 0; i < numberOfEdges; i++)
+            {
+                Int32 node1 = rnd.Next(0, numberOfNodes + 1);
+                Int32 node2 = rnd.Next(0, numberOfNodes + 1);
+
+                graph.ConnectTwoWay(node1, node1, node2, node2, rnd.Next(1, maxWeight));
+            }
+
+            Console.WriteLine($"Number of nodes is: {numberOfNodes}");
+            Console.WriteLine($"Number of edges is: {numberOfEdges}\n");
+
+            return graph;
+        }
     }
 }
