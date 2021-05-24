@@ -77,6 +77,12 @@ namespace MinimumSpanningTree.ConsoleUI
                 Int32 node1 = rnd.Next(0, numberOfNodes + 1);
                 Int32 node2 = rnd.Next(0, numberOfNodes + 1);
 
+                if (node1 == node2)
+                {
+                    i--;
+                    continue;
+                }
+
                 graph.ConnectTwoWay(node1, node1, node2, node2, rnd.Next(1, maxWeight));
             }
 

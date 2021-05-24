@@ -11,8 +11,7 @@ namespace MinimumSpanningTree.ConsoleUI
         public static void Main()
         {
             Stopwatch sw = new Stopwatch();
-            var graph = new Graph<Int32, Int32>();
-            graph = ExampleGraphs.GenerateRandomGraph(2000);
+            var graph = ExampleGraphs.GenerateRandomGraph(2000);
 
             sw.Start();
             var mst = graph.FindMinimumSpanningTree();
@@ -29,8 +28,10 @@ namespace MinimumSpanningTree.ConsoleUI
             
             ts = sw.Elapsed;
             String elapsedTimeParallel = ts.ToString();
-            
-            Console.WriteLine($"Runtime concurrent:\t {elapsedTimeConcurrent}\nRuntime parallel:\t {elapsedTimeParallel}\n");
+
+            Console.WriteLine($"Runtime concurrent:\t {elapsedTimeConcurrent}\n" +
+                              $"Runtime parallel:\t {elapsedTimeParallel}\n");
+
 
             var visitedNodes = new HashSet<Node<Int32, Int32>>();
 
