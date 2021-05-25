@@ -98,7 +98,7 @@ namespace MinimumSpanningTree.NonlinearDs
             while (disjointSet.NumberOfComponents > 1)
             {
                 var cheapest = new Dictionary<Node<TValue, TWeightedFactor>, (Node<TValue, TWeightedFactor> Node, Node<TValue, TWeightedFactor>.Edge Edge)>();
-                
+
                 foreach (var node in _data.Values)
                 {
                     foreach (var edge in node.Edges)
@@ -140,7 +140,7 @@ namespace MinimumSpanningTree.NonlinearDs
 
         public Graph<TValue, TWeightedFactor> FindMinimumSpanningTreeParallel()
         {
-            const Int32 numberofthreads = 100;
+            const Int32 numberofthreads = 8;
 
             var mstEdges = new ConcurrentQueue<(Node<TValue, TWeightedFactor> Node, Node<TValue, TWeightedFactor>.Edge Edge)>();
 
@@ -152,15 +152,15 @@ namespace MinimumSpanningTree.NonlinearDs
                 var cheapest = new ConcurrentDictionary<Node<TValue, TWeightedFactor>, (Node<TValue, TWeightedFactor> Node, Node<TValue, TWeightedFactor>.Edge Edge)>();
 
                 Parallel.ForEach(
-                    _data.Values, 
+                    _data.Values,
                     new ParallelOptions() { MaxDegreeOfParallelism = numberofthreads },
                     node => FindCheapestEdge(node, cheapest, disjointSet));
 
                 Parallel.ForEach(
                     _data.Values.Where(node => cheapest.ContainsKey(node)),
-                    new ParallelOptions() {MaxDegreeOfParallelism = numberofthreads },
+                    new ParallelOptions() { MaxDegreeOfParallelism = numberofthreads },
                     node => ContractComponents(node, mstEdges, cheapest, disjointSet));
-                
+
             }
 
             return GenerateMinimumSpanningTreeGraph(mstEdges);
@@ -199,37 +199,38 @@ namespace MinimumSpanningTree.NonlinearDs
         {
             mstEdges.Enqueue((cheapest[node].Node, cheapest[node].Edge));
 
+            var component1 = disjointSet.Find(cheapest[node].Node);
+            var component2 = disjointSet.Find(cheapest[node].Edge.Destination);
+
+            if (component1.Equals(component2))
+                return;
+
             lock (disjointSet)
             {
-                var component1 = disjointSet.Find(cheapest[node].Node);
-                var component2 = disjointSet.Find(cheapest[node].Edge.Destination);
-
-                if (component1.Equals(component2))
-                    return;
-
                 disjointSet.Union(component1, component2);
             }
 
         }
+
         private Graph<TValue, TWeightedFactor> GenerateMinimumSpanningTreeGraph(
             List<(Node<TValue, TWeightedFactor> Node, Node<TValue, TWeightedFactor>.Edge Edge)> mstEdges)
         {
             var mstGraph = new Graph<TValue, TWeightedFactor>();
-            
+
             foreach (var tuple in mstEdges)
             {
                 var sourceNode = tuple.Node;
                 var edge = tuple.Edge;
                 var destinationNode = edge.Destination;
-                
+
                 var sourceNodeId = _data.FirstOrDefault(x => x.Value.Equals(sourceNode)).Key;
                 var destinationNodeId = _data.FirstOrDefault(x => x.Value.Equals(destinationNode)).Key;
-                
+
                 mstGraph.ConnectTwoWay(
-                    sourceNodeId, 
-                    sourceNode.Value, 
-                    destinationNodeId, 
-                    destinationNode.Value, 
+                    sourceNodeId,
+                    sourceNode.Value,
+                    destinationNodeId,
+                    destinationNode.Value,
                     edge.WeightedFactor
                     );
             }
